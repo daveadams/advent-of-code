@@ -159,41 +159,52 @@ func main() {
 
 	startTime := time.Now()
 	possibilities := []string{targetMolecule}
+	matchesTotal := 0
+TopLoop:
 	for step := 0; ; step++ {
 		fmt.Printf("Search Depth %d; %d possibilities; ", step, len(possibilities))
 		next := []string{}
-		matchesAttempted := 0
 		for _, poss := range possibilities {
 			if poss == startingMolecule {
 				fmt.Printf("\nFOUND IT AT: ")
 				fmt.Println(step)
+				fmt.Printf("TOTAL SWAPS: %d\n", matchesTotal)
 				os.Exit(0)
 			}
 
-			matches := RevPattern.FindAllStringIndex(poss, -1)
-			if matches == nil {
-				// no need to go further
-				continue
+			matches := RevPattern.FindAllString(poss, -1)
+			matchesTotal += len(matches)
+			allReplaced := RevPattern.ReplaceAllStringFunc(poss, func(s string) string {
+				return RevSubs[s]
+			})
+			if allReplaced == poss {
+				break TopLoop
 			}
+			next = append(next, allReplaced)
+			//matches := RevPattern.FindAllStringIndex(poss, -1)
+			//if matches == nil {
+			//	// no need to go further
+			//	continue
+			//}
 
-			for _, match := range matches {
-				matchesAttempted++
-				start := match[0]
-				end := match[1]
-				matched := poss[start:end]
-				prefix := ""
-				suffix := ""
-				if start > 0 {
-					prefix = poss[0:start]
-				}
-				if end < len(poss) {
-					suffix = poss[end:len(poss)]
-				}
-				next = append(next, prefix+RevSubs[matched]+suffix)
-			}
+			//for _, match := range matches {
+			//	matchesAttempted++
+			//	start := match[0]
+			//	end := match[1]
+			//	matched := poss[start:end]
+			//	prefix := ""
+			//	suffix := ""
+			//	if start > 0 {
+			//		prefix = poss[0:start]
+			//	}
+			//	if end < len(poss) {
+			//		suffix = poss[end:len(poss)]
+			//	}
+			//	next = append(next, prefix+RevSubs[matched]+suffix)
+			//}
 		}
 		possibilities = next
-		fmt.Printf("%d matches; ", matchesAttempted)
+		fmt.Printf("%d matches; %s;", matchesTotal, possibilities[0])
 		fmt.Println(time.Since(startTime).Truncate(time.Second))
 		startTime = time.Now()
 	}
