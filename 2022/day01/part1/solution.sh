@@ -16,5 +16,8 @@ while read line; do
     fi
     elves[elf]+=$line
 done
+if (( elves[$elf] > max )); then
+    max=${elves[elf]}
+fi
 
 echo $max
