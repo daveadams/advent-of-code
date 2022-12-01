@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 
-declare -i line elf
-
+declare -i snack elf
 {
-    while read line; do
-        if (( line == 0 )); then
+    while read snack; do
+        if (( snack == 0 )); then
             echo $elf
             elf=0
             continue
         fi
-        elf+=$line
+        elf+=$snack
     done
     (( elf > 0 )) && echo $elf
 } \
