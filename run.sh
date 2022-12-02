@@ -167,12 +167,40 @@ run_ruby() {
     fi
 }
 
+clean_terraform() {
+    local year=$1
+    local day=$2
+    local rundir=$( day_lang_dir "$year" "$day" terraform )
+    rm -rf "$rundir/terraform.tfstate" "$rundir/.terraform" "$rundir/.terraform.lock.hcl"
+}
+
 run_terraform() {
     local year=$1
     local day=$2
     local rundir=$( day_lang_dir "$year" "$day" terraform )
 
-    echo "NOTICE: Terraform runs not yet supported"
+    echo "Running Terraform solutions for $year/$day:"
+
+    clean_terraform "$year" "$day"
+    cd "$rundir"
+
+    if ! terraform init &>/dev/null; then
+        die "Terraform init failed"
+    fi
+    if ! terraform apply -auto-approve &>/dev/null; then
+        die "Terraform apply failed"
+    fi
+    local output=$( terraform output -json solution )
+
+    echo "  Part 1:"
+    echo "    SAMPLE: $( jq -r .part1.sample <<< "$output" )"
+    echo "    ACTUAL: $( jq -r .part1.actual <<< "$output" )"
+    echo "  Part 2:"
+    echo "    SAMPLE: $( jq -r .part2.sample <<< "$output" )"
+    echo "    ACTUAL: $( jq -r .part2.actual <<< "$output" )"
+
+    cd "$execdir"
+    clean_terraform "$year" "$day"
 }
 
 run_go() {
