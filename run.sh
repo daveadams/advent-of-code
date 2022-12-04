@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-die() { echo "ERROR: $*" >&2; exit 1; }
+basedir=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; pwd )
+source "$basedir/lib/lib.sh" || { echo "ERROR: Unable to load lib.sh" >&2; exit 1; }
 
 print_usage() {
     {
@@ -18,8 +19,6 @@ case "$1" in
 esac
 
 execdir=$( pwd )
-basedir=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; pwd )
-
 if (( $# == 0 )); then
     reldir=${execdir/$basedir}
     IFS=/ read empty arg_year arg_day arg_lang <<< "$reldir"
@@ -28,35 +27,6 @@ elif (( $# > 0 )) && (( $# <= 3 )); then
     arg_day="$2"
     arg_lang="$3"
 fi
-
-sample_filename() { echo "$basedir/$1/$2/data/sample.txt"; }
-input_filename() { echo "$basedir/$1/$2/data/input.txt"; }
-year_dir() { echo "$basedir/$1"; }
-day_dir() { echo "$basedir/$1/$2"; }
-day_lang_dir() { echo "$basedir/$1/$2/$3"; }
-
-is_valid_year() { [[ -d "$basedir/$1" ]]; }
-is_valid_day() { [[ -d "$basedir/$1/$2" ]]; }
-is_valid_day_lang() { [[ -d "$basedir/$1/$2/$3" ]]; }
-is_valid_lang() {
-    case "$1" in
-        bash|ruby|terraform|go) return 0 ;;
-    esac
-    return 1
-}
-
-all_years() { ls -p "$basedir" |grep -E '^2[0-9]{3}/$' |sed 's,/$,,'; }
-all_days() {
-    local year=$1
-    is_valid_year "$year" || return 1
-    ls -p "$basedir/$year" |grep -E '^day[0-3][0-9]/$' |sed 's,/$,,'
-}
-all_day_langs() {
-    local year=$1
-    local day=$2
-    is_valid_day "$year" "$day" || return 1
-    ls -p "$basedir/$year/$day" |grep -E '^(bash|ruby|terraform|go)/$' |sed 's,/$,,'
-}
 
 run() {
     local year=$1 day=$2 lang=$3
@@ -105,7 +75,7 @@ run_day_lang() {
         die "Language '$lang' is not supported"
     fi
 
-    if ! is_valid_day_lang "$year" "$day" "$lang"; then
+    if ! day_lang_exists "$year" "$day" "$lang"; then
         die "No solutions found at $( day_lang_dir "$year" "$day" "$lang" )"
     fi
 
