@@ -96,19 +96,22 @@ run_bash() {
     local day=$2
     local part1=$( day_lang_dir "$year" "$day" bash )/part1.sh
     local part2=$( day_lang_dir "$year" "$day" bash )/part2.sh
+    local inputname
 
     echo "Running Bash solutions for $year/$day:"
     if [[ -f $part1 ]]; then
         echo "  Part 1:"
-        echo "    SAMPLE: $( bash "$part1" < "$( sample_filename "$year" "$day" )" )"
-        echo "    ACTUAL: $( bash "$part1" < "$( input_filename "$year" "$day" )" )"
+        for inputname in $( part_inputs $year $day 1 ); do
+            echo "    $inputname: $( bash "$part1" < "$( data_dir $year $day )/$inputname.txt" )"
+        done
     else
         echo "NOTICE: Part 1 solution was not found at $part1" >&2
     fi
     if [[ -f $part2 ]]; then
         echo "  Part 2:"
-        echo "    SAMPLE: $( bash "$part2" < "$( sample_filename "$year" "$day" )" )"
-        echo "    ACTUAL: $( bash "$part2" < "$( input_filename "$year" "$day" )" )"
+        for inputname in $( part_inputs $year $day 2 ); do
+            echo "    $inputname: $( bash "$part2" < "$( data_dir $year $day )/$inputname.txt" )"
+        done
     else
         echo "NOTICE: Part 2 solution was not found at $part2" >&2
     fi
@@ -123,15 +126,17 @@ run_ruby() {
     echo "Running Ruby solutions for $year/$day:"
     if [[ -f $part1 ]]; then
         echo "  Part 1:"
-        echo "    SAMPLE: $( ruby "$part1" < "$( sample_filename "$year" "$day" )" )"
-        echo "    ACTUAL: $( ruby "$part1" < "$( input_filename "$year" "$day" )" )"
+        for inputname in $( part_inputs $year $day 1 ); do
+            echo "    $inputname: $( ruby "$part1" < "$( data_dir $year $day )/$inputname.txt" )"
+        done
     else
         echo "NOTICE: Part 1 solution was not found at $part1" >&2
     fi
     if [[ -f $part2 ]]; then
         echo "  Part 2:"
-        echo "    SAMPLE: $( ruby "$part2" < "$( sample_filename "$year" "$day" )" )"
-        echo "    ACTUAL: $( ruby "$part2" < "$( input_filename "$year" "$day" )" )"
+        for inputname in $( part_inputs $year $day 2 ); do
+            echo "    $inputname: $( ruby "$part2" < "$( data_dir $year $day )/$inputname.txt" )"
+        done
     else
         echo "NOTICE: Part 2 solution was not found at $part2" >&2
     fi
@@ -163,11 +168,13 @@ run_terraform() {
     local output=$( terraform output -json solution )
 
     echo "  Part 1:"
-    echo "    SAMPLE: $( jq -r .part1.sample <<< "$output" )"
-    echo "    ACTUAL: $( jq -r .part1.actual <<< "$output" )"
+    for inputname in $( part_inputs $year $day 1 ); do
+        echo "    $inputname: $( jq -r .part1.$inputname <<< "$output" )"
+    done
     echo "  Part 2:"
-    echo "    SAMPLE: $( jq -r .part2.sample <<< "$output" )"
-    echo "    ACTUAL: $( jq -r .part2.actual <<< "$output" )"
+    for inputname in $( part_inputs $year $day 2 ); do
+        echo "    $inputname: $( jq -r .part2.$inputname <<< "$output" )"
+    done
 
     cd "$execdir"
     clean_terraform "$year" "$day"

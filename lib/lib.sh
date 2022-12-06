@@ -8,12 +8,13 @@ today_maybe() {
     fi
 }
 
-sample_filename() { echo "$( day_dir $1 $2 )/data/sample.txt"; }
-input_filename() { echo "$( day_dir $1 $2 )/data/input.txt"; }
-answers_filename() { echo "$( day_dir $1 $2 )/data/answers.json"; }
+sample_filename() { echo "$( data_dir $1 $2 )/sample.txt"; }
+input_filename() { echo "$( data_dir $1 $2 )/input.txt"; }
+answers_filename() { echo "$( data_dir $1 $2 )/answers.json"; }
 year_dir() { echo "$basedir/$1"; }
 day_dir() { echo "$basedir/$1/$2"; }
 day_lang_dir() { echo "$basedir/$1/$2/$3"; }
+data_dir() { echo "$basedir/$1/$2/data"; }
 
 is_valid_year() { [[ $1 =~ ^2[0-9]{3}$ ]]; }
 is_valid_day() { [[ $1 =~ ^day([0-1][0-9]|2[0-5])$ ]]; }
@@ -46,8 +47,25 @@ rel_path() { echo "${1/$basedir}" |sed s,^/,,; }
 create_dir() {
     local newdir=$1
     if [[ ! -d $newdir ]]; then
-        echo -n "Creating $(rel_path $newdir )... "
+        echo -n "Creating $( rel_path $newdir )... "
         mkdir -p "$newdir"
         echo OK
     fi
+}
+
+part_inputs() {
+    local year=$1
+    local day=$2
+    local part=$3
+
+    if [[ $part != 1 ]] && [[ $part != 2 ]]; then
+        die "Script Error: Invalid Part"
+    fi
+
+    local answers_file=$( answers_filename $year $day )
+    if [[ ! -f $answers_file ]]; then
+        die "Unable to read $( rel_path $answers_file )"
+    fi
+
+    jq -r '.part'"${part}"'|keys[]' "$answers_file"
 }
