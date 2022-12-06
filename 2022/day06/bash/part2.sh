@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-# buffer for the four characters being analyzed
 declare -a buffer
-
 declare -i i c=0
 declare -i -r BUFFER_LENGTH=14
 
