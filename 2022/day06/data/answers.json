@@ -1,0 +1,17 @@
+{
+  "part1": {
+    "sample": 5,
+    "sample2": 6,
+    "sample3": 10,
+    "sample4": 11,
+    "input": 1578
+  },
+  "part2": {
+    "sample5": 19,
+    "sample6": 23,
+    "sample7": 23,
+    "sample8": 29,
+    "sample9": 26,
+    "input": 2178
+  }
+}
