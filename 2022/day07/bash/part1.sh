@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 declare -A dir_sizes=( [/]=0 )
-declare vm_cmd=
 declare vm_dir=/
 
 vm_cd() {
@@ -46,40 +45,18 @@ add_size_to_dir() {
 
 while read line; do
     if [[ $line =~ ^\$ ]]; then
-        vm_cmd=
         read prompt cmd args <<< "$line"
-        case "$cmd" in
-            cd)
-                vm_cmd=cd
-                vm_cd "$args"
-                ;;
-
-            ls)
-                vm_cmd=ls
-                ;;
-
-            *)
-                echo "ERROR: Unexpected command '$cmd'" >&2
-                exit 1
-                ;;
-        esac
-        continue
+        # only the 'cd' command needs to do anything here
+        if [[ $cmd == cd ]]; then
+            vm_cd "$args"
+        fi
+    else
+        # process ls output instead
+        read size name <<< "$line"
+        if [[ $size != dir ]]; then
+            add_size_to_dir "$vm_dir" "$size"
+        fi
     fi
-
-    # process output instead
-    case "$vm_cmd" in
-        ls)
-            read size name <<< "$line"
-            if [[ $size != dir ]]; then
-                add_size_to_dir "$vm_dir" "$size"
-            fi
-            ;;
-
-        *)
-            echo "ERROR: Unexpected command output from '$vm_cmd'" >&2
-            exit 1
-            ;;
-    esac
 done
 
 declare -i sum=0
