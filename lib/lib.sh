@@ -3,7 +3,7 @@ die() { echo "ERROR: $*" >&2; exit 1; }
 today_maybe() {
     local y m d
     read y m d <<< "$( date "+%Y %m %d" )"
-    if [[ $m == 12 ]] && (( d <= 25 )); then
+    if [[ $m == 12 ]] && (( $( sed s/^0// <<< "$d" ) <= 25 )); then
         echo $y/day$d
     fi
 }
