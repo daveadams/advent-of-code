@@ -8,7 +8,7 @@ declare -i tx=0 ty=0
 
 # history of tail movements
 declare -A tail_trail
-tail_trail[x=$tx,y=$ty]=1
+record_trail() { tail_trail[x=$tx,y=$ty]=1; }
 
 # move adjusts the position of the head by one position
 move() {
@@ -44,16 +44,16 @@ adjust_tail() {
         1|2)   ty+=1  ;;
         -1|-2) ty+=-1 ;;
     esac
-
-    tail_trail[x=$tx,y=$ty]=1
-    return 0
 }
+
+record_trail
 
 declare -i distance i
 while read direction distance; do
     for (( i = 0; i < $distance; i++ )); do
         move $direction
         adjust_tail
+        record_trail
     done
 done
 

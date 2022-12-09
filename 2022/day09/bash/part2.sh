@@ -11,7 +11,7 @@ done
 
 # history of tail movements
 declare -A tail_trail
-tail_trail[x=0,y=0]=1
+record_trail() { tail_trail[x=${x[$TAIL_LENGTH]},y=${y[$TAIL_LENGTH]}]=1; }
 
 # move adjusts the position of the head by one position
 move() {
@@ -53,12 +53,13 @@ adjust_tail() {
     done
 }
 
+record_trail
 declare -i distance i
 while read direction distance; do
     for (( i = 0; i < $distance; i++ )); do
         move $direction
         adjust_tail
-        tail_trail[x=${x[$TAIL_LENGTH]},y=${y[$TAIL_LENGTH]}]=1
+        record_trail
     done
 done
 
