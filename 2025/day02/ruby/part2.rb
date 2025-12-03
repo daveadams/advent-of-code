@@ -45,10 +45,6 @@ class Range
     end.flatten.uniq
   end
 
-  def suffix_length
-    @suffix_length ||= @start.length - (@start.length/2)
-  end
-
   def invalid_ids
     minlen = @start.length
     maxlen = @end.length
