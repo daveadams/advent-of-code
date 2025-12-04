@@ -12,6 +12,7 @@ class Grid
     end
 
     @neighbors = {}
+    @accessible_cells = nil
   end
 
   def cell_has_paper?(x, y)
@@ -48,13 +49,15 @@ class Grid
   end
 
   def accessible_cells
-    cells = []
+    return @accessible_cells unless @accessible_cells.nil?
+
+    @accessible_cells = []
     @grid.each_index do |x|
       @grid[x].each_index do |y|
-        cells.push([x,y]) if self.cell_has_accessible_paper?(x, y)
+        @accessible_cells.push([x,y]) if self.cell_has_accessible_paper?(x, y)
       end
     end
-    cells
+    @accessible_cells
   end
 
   def accessible_cell_count
@@ -66,6 +69,7 @@ class Grid
       x, y = *coord
       @grid[x][y] = "x"
     end
+    @accessible_cells = nil
   end
 end
 
